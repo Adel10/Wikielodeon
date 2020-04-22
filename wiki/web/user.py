@@ -139,6 +139,7 @@ def check_hashed_password(password, salted_hash):
     return make_salted_hash(password, salt) == salted_hash
 
 
+
 def protect(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
