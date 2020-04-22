@@ -55,12 +55,3 @@ class LoginForm(Form):
             return
         if not user.check_password(field.data):
             raise ValidationError('Username and password do not match.')
-
-
-class DeletionForm(Form):
-    name = TextField('', [InputRequired()])
-
-    def validate_name(form, field):
-        user = current_users.get_user(field.data)
-        if not user:
-            raise ValidationError('This username does not exist.')
