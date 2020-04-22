@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Users List{% endblock %}
+
+{% block content %}
+{% if names %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Password</th>
+                <th>Authentication Method</th>
+                <th>Roles</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for x in range(count) %}
+                <tr>
+                    <td>{{ names[x] }}</td>
+                    <td>{{ data[x]['password'] }}</td>
+                    <td>{{ data[x]['authentication_method'] }}</td>
+                    <td>{{ data[x]['roles'] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>There are no users in the system.</p>
+{% endif %}
+{% endblock %}

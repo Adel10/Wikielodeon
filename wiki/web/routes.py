@@ -4,24 +4,25 @@
 """
 from flask import Blueprint
 from flask import flash
+import json
 from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
+from flask import jsonify
 from flask_login import current_user
 from flask_login import login_required
 from flask_login import login_user
 from flask_login import logout_user
 
 from wiki.core import Processor
-from wiki.web.forms import EditorForm
+from wiki.web.forms import EditorForm, DeletionForm
 from wiki.web.forms import LoginForm
 from wiki.web.forms import SearchForm
 from wiki.web.forms import URLForm
 from wiki.web import current_wiki
 from wiki.web import current_users
 from wiki.web.user import protect
-
 
 bp = Blueprint('wiki', __name__)
 
@@ -81,6 +82,42 @@ def preview():
     processor = Processor(request.form['body'])
     data['html'], data['body'], data['meta'] = processor.process()
     return data['html']
+
+
+"""page_preview is called on hover of any anchor tag elements. It performs validation to make sure it is only an anchor 
+tag on the body of the page and not a tab at the top of the screen for example
+Returns back an html version of the page to be rendered in the pagePreview div
+
+"""
+@bp.route('/pagePreview')
+def page_preview():
+    url = request.args.get('currentTag', 0)
+    url = url.strip("/")
+
+    is_delete = request.args.get('isDeleteBtn', 0)
+    is_riki_tab = request.args.get('isRikiLink', 0)
+
+    if is_normal_href_link(url) and is_delete == '' and is_riki_tab != ('Riki' and 'Cancel' and 'Wikielodeon'):
+        page = current_wiki.get_or_404(url)
+
+        data = {}
+        processor = Processor(page.content)
+        data['html'], data['body'], data['meta'] = processor.process()
+        return jsonify(result=data['html'])
+
+    return "None"
+
+
+""" performs some validation used in page_preview
+    Checks to see that it is not the home page or one of the buttons on the right side of the UI
+    edit, tags, move
+"""
+def is_normal_href_link(url):
+    if ('edit/' not in url) and ('move/' not in url) and (url != '/') and (
+            'tag/' not in url):
+        return True
+    else:
+        return False
 
 
 @bp.route('/move/<path:url>/', methods=['GET', 'POST'])
@@ -150,9 +187,23 @@ def user_logout():
     return redirect(url_for('wiki.index'))
 
 
-@bp.route('/user/')
-def user_index():
-    pass
+@bp.route('/user/list')
+@protect
+def user_list():
+    """
+    This will get all the user that are regestered
+    in the system, it will format the output into
+    a table.
+
+    This will list the names, passwords, authentication method, and
+    any roles that these users have.
+    """
+    with open('user/users.json') as f:
+        user_info = json.loads(f.read())
+    user_names = [k for k in user_info]
+    users_data = [v for v in user_info.values()]
+    count = len(user_names)
+    return render_template('user_list.html', names=user_names, data=users_data, count=count)
 
 
 @bp.route('/user/create/')
@@ -160,14 +211,41 @@ def user_create():
     pass
 
 
-@bp.route('/user/<int:user_id>/')
-def user_admin(user_id):
-    pass
+@bp.route('/admin/')
+@protect
+def admin():
+    """
+    This is the admin route, this will only
+    allow certain user in and redirect those without
+    the permissions to the index with a message.
+
+    The admin page will have the option of deleting a user
+    , or listing the users with relevant info
+    """
+    roles = current_user.get('roles')
+
+    if 'ADMIN' in roles:
+        return render_template('admin.html')
+    else:
+        flash('Insufficient Permissions to access this page', 'danger')
+        return redirect(url_for('wiki.home'))
 
 
-@bp.route('/user/delete/<int:user_id>/')
-def user_delete(user_id):
-    pass
+@bp.route('/user/delete/', methods=['GET', 'POST'])
+@protect
+def user_delete():
+    """
+    This rout will create a Deletion form
+    which will ask for the username of the
+    user they want to delete, it will give them an error
+    when the user does not exists
+    """
+    form = DeletionForm()
+    if form.validate_on_submit():
+        current_users.delete_user(form.name.data)
+        flash(form.name.data + " successfully deleted", "success")
+        return redirect(url_for('wiki.admin'))
+    return render_template('user_delete.html', form=form)
 
 
 """
@@ -179,4 +257,3 @@ def user_delete(user_id):
 @bp.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
-
