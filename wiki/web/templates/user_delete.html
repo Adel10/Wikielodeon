@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Delete User{% endblock title %}
+
+{% block content %}
+    <p> Please enter a username and press delete to delete the user.</p>
+<form class="form form-inline" method="POST">
+	{{ form.hidden_tag() }}
+	{{ form.name(placeholder='Username') }}
+	<input type="submit" class="btn btn-danger" value="Delete">
+</form>
+{% endblock content %}

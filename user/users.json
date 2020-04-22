@@ -1,16 +1,36 @@
 {
   "name": {
-    "active": true, 
-    "authentication_method": "cleartext", 
-    "password": "1234", 
-    "authenticated": true, 
+    "active": true,
+    "authentication_method": "cleartext",
+    "password": "1234",
+    "authenticated": true,
+    "roles": [
+      "ADMIN"
+    ]
+  },
+  "root": {
+    "active": true,
+    "authentication_method": "cleartext",
+    "password": "admin",
+    "authenticated": true,
+    "roles": [
+      "ADMIN"
+    ]
+  },
+  "adel": {
+    "active": true,
+    "authentication_method": "cleartext",
+    "password": "1234",
+    "authenticated": false,
     "roles": []
-  }, 
-  "sam": {
-    "active": true, 
-    "authentication_method": "cleartext", 
-    "password": "1234", 
-    "authenticated": true, 
-    "roles": []
+  },
+  "jacob": {
+    "active": true,
+    "authentication_method": "cleartext",
+    "password": "1234",
+    "authenticated": true,
+    "roles": [
+      "ADMIN"
+    ]
   }
 }
