@@ -9,6 +9,7 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
+from flask import jsonify
 from flask_login import current_user
 from flask_login import login_required
 from flask_login import login_user
@@ -81,6 +82,42 @@ def preview():
     processor = Processor(request.form['body'])
     data['html'], data['body'], data['meta'] = processor.process()
     return data['html']
+
+
+"""page_preview is called on hover of any anchor tag elements. It performs validation to make sure it is only an anchor 
+tag on the body of the page and not a tab at the top of the screen for example
+Returns back an html version of the page to be rendered in the pagePreview div
+
+"""
+@bp.route('/pagePreview')
+def page_preview():
+    url = request.args.get('currentTag', 0)
+    url = url.strip("/")
+
+    is_delete = request.args.get('isDeleteBtn', 0)
+    is_riki_tab = request.args.get('isRikiLink', 0)
+
+    if is_normal_href_link(url) and is_delete == '' and is_riki_tab != ('Riki' and 'Cancel' and 'Wikielodeon'):
+        page = current_wiki.get_or_404(url)
+
+        data = {}
+        processor = Processor(page.content)
+        data['html'], data['body'], data['meta'] = processor.process()
+        return jsonify(result=data['html'])
+
+    return "None"
+
+
+""" performs some validation used in page_preview
+    Checks to see that it is not the home page or one of the buttons on the right side of the UI
+    edit, tags, move
+"""
+def is_normal_href_link(url):
+    if ('edit/' not in url) and ('move/' not in url) and (url != '/') and (
+            'tag/' not in url):
+        return True
+    else:
+        return False
 
 
 @bp.route('/move/<path:url>/', methods=['GET', 'POST'])
