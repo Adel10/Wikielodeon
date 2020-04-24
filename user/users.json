@@ -12,5 +12,19 @@
     "password": "1234",
     "authenticated": true,
     "roles": []
+  },
+  "Ganesh": {
+    "active": true,
+    "roles": [],
+    "authentication_method": "cleartext",
+    "authenticated": false,
+    "password": "nkunku12"
+  },
+  "ball": {
+    "active": true,
+    "roles": [],
+    "authentication_method": "cleartext",
+    "authenticated": true,
+    "password": "nkunku12"
   }
 }

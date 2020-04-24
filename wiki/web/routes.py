@@ -23,7 +23,6 @@ from wiki.web import current_users
 from wiki.web.user import protect
 from wiki.web.forms import RegisterForm
 
-
 bp = Blueprint('wiki', __name__)
 
 
@@ -158,21 +157,18 @@ def user_index():
 
 @bp.route('/user/create/', methods=['POST', 'GET'])
 def user_create():
-    # form = LoginForm()
-    # print(form.validate_on_submit())
-    # if form.validate_on_submit():
-    #     print("after validation")
-    #     current_users.add_user(form.name.data, form.password.data)
-    #     user = current_users.get_user(form.name.data)
-    #     login_user(user)
-    #     user.set('authenticated', True)
-    #     flash('Login successful.', 'success')
-    #     return redirect(request.args.get("next") or url_for('wiki.index'))
-    # return render_template('signup.html', form=form)
     form = RegisterForm()
-    print(form.name.data)
-    print(form.password.data)
+    if form.name.data is not None and form.password.data is not None:
+        user_found = False
+        if current_users.get_user(request.form.get('name')) is not None:
+            user_found = True
+            flash('Username was taken, please try again.', 'error')
+        if user_found is False:
+            current_users.add_user(name=form.name.data, password=form.password.data)
+            flash('User creation successful.', 'success')
+            return redirect(url_for('wiki.user_login'))
     return render_template('signup.html', form=form)
+
 
 @bp.route('/user/<int:user_id>/')
 def user_admin(user_id):
@@ -193,4 +189,3 @@ def user_delete(user_id):
 @bp.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
-
