@@ -206,7 +206,7 @@ def user_list():
     count = len(user_names)
     return render_template('user_list.html', names=user_names, data=users_data, count=count)
 
-@bp.route('/user/create/', methods=['POST', 'GET'])
+@bp.route('/user/create/', methods=['POST'])
 def user_create():
     form = RegisterForm()
     if form.name.data is not None and form.password.data is not None:
