@@ -64,3 +64,8 @@ class DeletionForm(Form):
         user = current_users.get_user(field.data)
         if not user:
             raise ValidationError('This username does not exist.')
+
+
+class RegisterForm(Form):
+    name = TextField('', [InputRequired()])
+    password = PasswordField('', [InputRequired()])
