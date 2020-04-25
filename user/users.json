@@ -1,5 +1,6 @@
 {
   "name": {
+    "authenticated": true,
     "active": true,
     "authentication_method": "cleartext",
     "password": "1234",
