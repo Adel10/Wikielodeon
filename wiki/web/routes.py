@@ -90,6 +90,8 @@ tag on the body of the page and not a tab at the top of the screen for example
 Returns back an html version of the page to be rendered in the pagePreview div
 
 """
+
+
 @bp.route('/pagePreview')
 def page_preview():
     url = request.args.get('currentTag', 0)
@@ -113,6 +115,8 @@ def page_preview():
     Checks to see that it is not the home page or one of the buttons on the right side of the UI
     edit, tags, move
 """
+
+
 def is_normal_href_link(url):
     if ('edit/' not in url) and ('move/' not in url) and (url != '/') and (
             'tag/' not in url):
@@ -206,7 +210,8 @@ def user_list():
     count = len(user_names)
     return render_template('user_list.html', names=user_names, data=users_data, count=count)
 
-@bp.route('/user/create/', methods=['POST'])
+
+@bp.route('/user/create/', methods=['POST', 'GET'])
 def user_create():
     form = RegisterForm()
     if form.name.data is not None and form.password.data is not None:
