@@ -234,12 +234,21 @@ def user_list():
 
 @bp.route('/user/create/', methods=['POST', 'GET'])
 def user_create():
+    # create a register from to transfer post signup data to backend
     form = RegisterForm()
+
+    # check for name and password data validation
+    # This check also acts as a post vs get request in a sense that
+    # empty name and password fields act as a get request and non-empty
+    # fields act as post request
     if form.name.data is not None and form.password.data is not None:
         user_found = False
+        # checks for already existing user name
         if current_users.get_user(request.form.get('name')) is not None:
             user_found = True
             flash('Username was taken, please try again.', 'error')
+        # checks for new user
+        # if doesn't find in the database creates a new user.
         if user_found is False:
             current_users.add_user(name=form.name.data, password=form.password.data)
             flash('User creation successful.', 'success')
