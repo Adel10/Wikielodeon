@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %} History Diff {% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        {% for diff in diff_data %}
+                {% if diff[3] %}
+                    <div style="font-weight: bold; font-size: large; padding-bottom: 8px; padding-top: 35px">{{ diff[0] }}</div>
+                    <div style="background-color: #ffe9ec">- {{ diff[1] }}</div>
+                    <div style="background-color: #d2f8d2">+ {{ diff[2] }}</div>
+                {% else %}
+                    <div style="font-weight: bold; font-size: large; padding-bottom: 8px; padding-top: 35px">{{ diff[0] }}</div>
+                    <div style="background-color: #ffffed">{{ diff[1] }}</div>
+                    <div style="background-color: #ffffed">{{ diff[2] }}</div>
+                {% endif %}
+        {% endfor %}
+    </div>
+</div>
+<table style="margin-top: 100px; margin-left: -30px">
+    <thead>
+        <tr>
+            <th style="font-size: large">Colors</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="background-color: #d2f8d2">Added</td>
+        </tr>
+        <tr>
+            <td style="background-color: #ffe9ec">Deleted</td>
+        </tr>
+        <tr>
+            <td style="background-color: #ffffed">Unchanged</td>
+        </tr>
+    </tbody>
+</table>
+{% endblock content %}
+

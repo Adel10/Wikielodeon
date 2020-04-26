@@ -8,6 +8,7 @@ from werkzeug.local import LocalProxy
 
 from wiki.core import Wiki
 from wiki.web.user import UserManager
+from wiki.web.history import HistoryManager
 
 class WikiError(Exception):
     pass
@@ -27,6 +28,14 @@ def get_users():
     return users
 
 current_users = LocalProxy(get_users)
+
+def get_history():
+    history = getattr(g, '_history', None)
+    if history is None:
+        history = g._history = HistoryManager(current_app.config['HISTORY_DIR'])
+    return history
+
+current_history = LocalProxy(get_history)
 
 
 def create_app(directory):

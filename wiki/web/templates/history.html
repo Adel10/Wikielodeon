@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %} Edit history {% endblock title %}
+
+{% block content %}
+{% if page_history %}
+	<table class="table">
+		<thead>
+			<tr>
+				<th>User</th>
+				<th>Date</th>
+                <th>Changes</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for history in page_history.data %}
+				<tr>
+					<td>{{ history.username }}</td>
+					<td>{{ history.date }}</td>
+                    <td><a href="{{ url_for('wiki.history_diff', url= url, id=history.id) }}">Show Diff</a></td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% else %}
+	<p>There is no history for this page.</p>
+{% endif %}
+{% endblock content %}
+

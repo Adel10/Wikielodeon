@@ -6,5 +6,6 @@ HISTORY_SHOW_MAX=30
 PIC_BASE = '/static/content/'
 CONTENT_DIR = 'content'
 USER_DIR = 'user'
+HISTORY_DIR = 'history'
 NUMBER_OF_HISTORY = 5
 PRIVATE = True

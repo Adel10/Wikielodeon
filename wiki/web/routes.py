@@ -22,6 +22,7 @@ from wiki.web.forms import SearchForm
 from wiki.web.forms import URLForm
 from wiki.web import current_wiki
 from wiki.web import current_users
+from wiki.web import current_history
 from wiki.web.user import protect
 from wiki.web.forms import RegisterForm
 
@@ -65,12 +66,16 @@ def create():
 @protect
 def edit(url):
     page = current_wiki.get(url)
+    old_page = current_wiki.get(url)
     form = EditorForm(obj=page)
     if form.validate_on_submit():
         if not page:
             page = current_wiki.get_bare(url)
+            old_page = page
         form.populate_obj(page)
         page.save()
+        if old_page != page:
+            current_history.add_history(current_user.name, url, old_page, page)
         flash('"%s" was saved.' % page.title, 'success')
         return redirect(url_for('wiki.display', url=url))
     return render_template('editor.html', form=form, page=page)
@@ -133,6 +138,7 @@ def move(url):
     if form.validate_on_submit():
         newurl = form.url.data
         current_wiki.move(url, newurl)
+        current_history.rename_page_history(url, newurl)
         return redirect(url_for('wiki.display', url=newurl))
     return render_template('move.html', form=form, page=page)
 
@@ -142,8 +148,23 @@ def move(url):
 def delete(url):
     page = current_wiki.get_or_404(url)
     current_wiki.delete(url)
+    current_history.delete_history(url)
     flash('Page "%s" was deleted.' % page.title, 'success')
     return redirect(url_for('wiki.home'))
+
+
+@bp.route('/history/<path:url>/', methods=['GET', 'POST'])
+@protect
+def history(url):
+    page_history = current_history.get_history(url)
+    return render_template('history.html', page_history=page_history, url=url)
+
+
+@bp.route('/history/diff/<path:url>/<string:id>/', methods=['GET', 'POST'])
+@protect
+def history_diff(url, id):
+    diff_data = current_history.get_history_diff(url, id)
+    return render_template('history_diff.html', diff_data=diff_data)
 
 
 @bp.route('/tags/')
